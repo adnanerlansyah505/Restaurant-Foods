@@ -1,7 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantFoods.Data;
+using RestaurantFoods.Repositories;
+using RestaurantFoods.Repositories.Interfaces;
+using RestaurantFoods.Services;
+using RestaurantFoods.Services.Interfaces;
+using RestaurantFoods.Services.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<PasswordHasher>();
 
 // Add controllers
 builder.Services.AddControllers();
