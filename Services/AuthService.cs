@@ -12,13 +12,16 @@ namespace RestaurantFoods.Services;
 public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IProfileRepository _profileRepository;
     private readonly PasswordHasher _passwordHasher;
 
     public AuthService(
         IUserRepository userRepository,
+        IProfileRepository profileRepository,
         PasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
+        _profileRepository = profileRepository;
         _passwordHasher = passwordHasher;
     }
 
@@ -36,6 +39,15 @@ public class AuthService : IAuthService
 
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
+        
+        // Auto create profile
+        var profile = new Profile
+        {
+            UserId = user.Id
+        };
+
+        await _profileRepository.AddAsync(profile);
+        await _profileRepository.SaveChangesAsync();
 
         return new UserDto(user.Id, user.Name, user.Username, user.Email, user.RoleId);
     }

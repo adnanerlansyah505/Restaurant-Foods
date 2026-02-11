@@ -11,11 +11,13 @@ namespace RestaurantFoods.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IProfileRepository _profileRepository;
     private readonly PasswordHasher _passwordHasher;
 
-    public UserService(IUserRepository userRepository, PasswordHasher passwordHasher)
+    public UserService(IUserRepository userRepository, IProfileRepository profileRepository, PasswordHasher passwordHasher)
     {
         _userRepository = userRepository;
+        _profileRepository = profileRepository;
         _passwordHasher = passwordHasher;
     }
 
@@ -30,6 +32,7 @@ public class UserService : IUserService
         var totalItems = await query.CountAsync();
 
         var users = await query
+            .Include(u => u.Profile)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(u => new UserDto(
@@ -80,6 +83,15 @@ public class UserService : IUserService
 
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
+        
+        // Auto create profile
+        var profile = new Profile
+        {
+            UserId = user.Id
+        };
+
+        await _profileRepository.AddAsync(profile);
+        await _profileRepository.SaveChangesAsync();
 
         return new UserDto(
             user.Id,
