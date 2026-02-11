@@ -1,6 +1,7 @@
 using RestaurantFoods.Dtos.Auth;
 using RestaurantFoods.Dtos.Users;
 using RestaurantFoods.Models;
+using RestaurantFoods.Models.Data;
 using RestaurantFoods.Repositories.Interfaces;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Services.Security;
@@ -36,7 +37,7 @@ public class AuthService : IAuthService
         await _userRepository.AddAsync(user);
         await _userRepository.SaveChangesAsync();
 
-        return new UserDto(user.Id, user.Name, user.Email);
+        return new UserDto(user.Id, user.Name, user.Username, user.Email, user.RoleId);
     }
 
     public async Task<string> LoginAsync(LoginDto dto)

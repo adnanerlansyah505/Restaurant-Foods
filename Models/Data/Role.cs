@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using RestaurantFoods.Models;
 
-namespace RestaurantFoods.Models;
+namespace RestaurantFoods.Models.Data;
 
 [Table("roles")]
 public class Role : BaseEntity

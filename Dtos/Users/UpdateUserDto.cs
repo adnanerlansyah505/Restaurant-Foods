@@ -2,12 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RestaurantFoods.Dtos.Users;
 
-public record CreateUserDto(
+public record UpdateUserDto(
     [Required]
     [StringLength(50)]
     string Name,
     
-    [Required]
     [EmailAddress]
     string Email,
 
@@ -16,6 +15,6 @@ public record CreateUserDto(
 
     [Required, MinLength(8)]
     string Password,
-    
+
     Guid RoleId
 );

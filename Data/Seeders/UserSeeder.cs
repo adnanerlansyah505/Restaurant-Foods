@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantFoods.Models;
+using RestaurantFoods.Models.Data;
 using RestaurantFoods.Constants;
 using RestaurantFoods.Services.Security;
 

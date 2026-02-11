@@ -1,4 +1,4 @@
-using RestaurantFoods.Models;
+using RestaurantFoods.Models.Data;
 
 namespace RestaurantFoods.Repositories.Interfaces;
 

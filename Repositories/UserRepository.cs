@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantFoods.Data;
 using RestaurantFoods.Models;
+using RestaurantFoods.Models.Data;
 using RestaurantFoods.Repositories.Interfaces;
 
 namespace RestaurantFoods.Repositories;

@@ -34,7 +34,7 @@ public class UsersController : ControllerBase
             {
                 Code = StatusCodes.Status404NotFound,
                 Status = HttpStatusCode.NotFound.ToString(),
-                Message = "Users not found"
+                Message = "Users not found",
             });
         }
 
@@ -45,6 +45,87 @@ public class UsersController : ControllerBase
             Message = "Users retrieved successfully",
             Data = users,
             Meta = meta
+        });
+    }
+    
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetUserById(Guid id)
+    {
+        var user = await _userService.GetUserByIdAsync(id);
+
+        if (user == null)
+            return NotFound(new ResponseHandlers<UserDto>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "User not found"
+            });
+
+        return Ok(new ResponseHandlers<UserDto>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "User retrieved successfully",
+            Data = user
+        });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateUser(CreateUserDto userDto)
+    {
+        var user = await _userService.CreateUserAsync(userDto);
+
+        return Ok(new ResponseHandlers<UserDto>
+        {
+            Code = StatusCodes.Status201Created,
+            Status = HttpStatusCode.Created.ToString(),
+            Message = "User created successfully",
+            Data = user
+        });
+    }
+    
+    // 🔹 UPDATE
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUser(Guid id, UpdateUserDto userDto)
+    {
+        var user = await _userService.UpdateUserAsync(id, userDto);
+
+        if (user == null)
+            return NotFound(new ResponseHandlers<UserDto>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "User not found"
+            });
+
+        return Ok(new ResponseHandlers<UserDto>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "User updated successfully",
+            Data = user
+        });
+    }
+
+    // 🔹 DELETE
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(Guid id)
+    {
+        var deleted = await _userService.DeleteUserAsync(id);
+
+        if (!deleted)
+            return NotFound(new ResponseHandlers<object>
+            {
+                Code = StatusCodes.Status404NotFound,
+                Status = HttpStatusCode.NotFound.ToString(),
+                Message = "User not found"
+            });
+
+        return Ok(new ResponseHandlers<object>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "User deleted successfully"
         });
     }
 }
