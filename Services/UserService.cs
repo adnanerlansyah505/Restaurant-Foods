@@ -1,7 +1,8 @@
-using RestaurantFoods.Models;
+using Microsoft.EntityFrameworkCore;
+using RestaurantFoods.Commons.Pagination;
+using RestaurantFoods.Dtos.Users;
 using RestaurantFoods.Repositories.Interfaces;
 using RestaurantFoods.Services.Interfaces;
-using RestaurantFoods.Dtos.Users;
 
 namespace RestaurantFoods.Services;
 
@@ -14,15 +15,31 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public async Task<IEnumerable<UserDto>> GetUsersAsync()
+    public async Task<(IEnumerable<UserDto> Users, PaginationMeta Meta)>
+        GetUsersAsync(int page, int pageSize)
     {
-        var users = await _userRepository.GetAllAsync();
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize <= 0 || pageSize > 10 ? 10 : pageSize;
 
-        return users.Select(u => new UserDto(
-            u.Id,
-            u.Name,
-            u.Email
-        ));
+        var query = _userRepository.Query();
+
+        var totalItems = await query.CountAsync();
+
+        var users = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(u => new UserDto(u.Id, u.Name, u.Email))
+            .ToListAsync();
+
+        var meta = new PaginationMeta
+        {
+            Page = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
+            TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+        };
+
+        return (users, meta);
     }
 
     public async Task<UserDto?> GetUserByIdAsync(Guid id)
@@ -56,5 +73,4 @@ public class UserService : IUserService
         await _userRepository.SaveChangesAsync();
         return true;
     }
-
 }

@@ -14,6 +14,11 @@ public class UserRepository : IUserRepository
         _context = context;
     }
 
+    public IQueryable<User> Query()
+    {
+        return _context.Users.AsNoTracking();
+    }
+
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _context.Users

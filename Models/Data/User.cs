@@ -25,6 +25,9 @@ public class User : BaseEntity
     [Column("is_email_verified")]
     public bool IsEmailVerified { get; set; } = false;
 
+    [Column("status")]
+    public bool Status { get; set; } = true;
+
     [Column("password", TypeName = "nvarchar(255)")]
     public required string Password { get; set; }
     
