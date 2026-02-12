@@ -6,6 +6,7 @@ using RestaurantFoods.Repositories.Interfaces;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Services.Security;
 using RestaurantFoods.Constants;
+using RestaurantFoods.Exceptions.Identity;
 
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -39,6 +40,11 @@ public class AuthService : IAuthService
 
     public async Task<UserDto> RegisterAsync(RegisterDto dto)
     {
+        var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+
+        if (existingUser != null)
+            throw new EmailAlreadyExistsException();
+
         var user = new User
         {
             Id = Guid.NewGuid(),
