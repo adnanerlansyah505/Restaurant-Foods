@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using RestaurantFoods.Dtos.Auth;
 using RestaurantFoods.Services.Interfaces;
+using RestaurantFoods.Utilities.Handlers;
+using System.Net;
 
 namespace RestaurantFoods.Controllers;
 
@@ -26,13 +28,60 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login(LoginDto dto)
     {
         var token = await _authService.LoginAsync(dto);
-        return Ok(new { token });
+
+        if (token == null)
+        {
+            return Unauthorized(new ResponseHandlers<object>
+            {
+                Code = StatusCodes.Status401Unauthorized,
+                Status = HttpStatusCode.Unauthorized.ToString(),
+                Message = "Invalid email or password"
+            });
+        }
+
+        return Ok(new ResponseHandlers<object>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Login successful",
+            Data = new { token }
+        });
     }
 
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordDto dto)
     {
         await _authService.ForgotPasswordAsync(dto);
-        return Ok();
+
+        return Ok(new ResponseHandlers<object>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "If the email exists, OTP has been sent"
+        });
     }
+    
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordDto dto)
+    {
+        var result = await _authService.ResetPasswordAsync(dto);
+
+        if (!result)
+        {
+            return BadRequest(new ResponseHandlers<object>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Invalid or expired OTP"
+            });
+        }
+
+        return Ok(new ResponseHandlers<object>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Password updated successfully"
+        });
+    }
+
 }

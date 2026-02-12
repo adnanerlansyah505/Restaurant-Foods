@@ -30,6 +30,12 @@ public class User : BaseEntity
 
     [Column("password", TypeName = "nvarchar(255)")]
     public required string Password { get; set; }
+
+    [Column("otp_code", TypeName = "nvarchar(255)")]
+    public string? OtpCode { get; set; }
+
+    [Column("otp_expired_at")]
+    public DateTime? OtpExpiredAt { get; set; }
     
     // Foreign key
     [Column("role_id")]

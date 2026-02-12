@@ -7,5 +7,5 @@ public record UserDto(
     string Name,
     string Email,
     string Username,
-    Guid? RoleId
+    Guid? RoleId = null
 );

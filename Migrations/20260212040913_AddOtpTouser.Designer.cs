@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantFoods.Data;
 
@@ -11,9 +12,11 @@ using RestaurantFoods.Data;
 namespace RestaurantFoods.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260212040913_AddOtpTouser")]
+    partial class AddOtpTouser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -143,9 +146,9 @@ namespace RestaurantFoods.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("otp_code");
 
-                    b.Property<DateTime?>("OtpExpiredAt")
+                    b.Property<DateTime?>("OtpExpireAt")
                         .HasColumnType("datetime2")
-                        .HasColumnName("otp_expired_at");
+                        .HasColumnName("otp_expire_at");
 
                     b.Property<string>("Password")
                         .IsRequired()
