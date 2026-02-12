@@ -20,18 +20,21 @@ public class AuthService : IAuthService
     private readonly IProfileRepository _profileRepository;
     private readonly PasswordHasher _passwordHasher;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
     public AuthService(
         IUserRepository userRepository,
         IProfileRepository profileRepository,
         PasswordHasher passwordHasher,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IEmailService emailService
     )
     {
         _userRepository = userRepository;
         _profileRepository = profileRepository;
         _passwordHasher = passwordHasher;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<UserDto> RegisterAsync(RegisterDto dto)
@@ -43,7 +46,10 @@ public class AuthService : IAuthService
             Username = dto.Username,
             Email = dto.Email,
             Password = _passwordHasher.Hash(dto.Password),
-            RoleId = DefaultRoles.UserId // we’ll define this
+            RoleId = DefaultRoles.UserId,
+            IsEmailVerified = false,
+            EmailVerificationToken = Guid.NewGuid().ToString(),
+            EmailVerificationExpiredAt = DateTime.UtcNow.AddMinutes(15)
         };
 
         await _userRepository.AddAsync(user);
@@ -57,6 +63,22 @@ public class AuthService : IAuthService
 
         await _profileRepository.AddAsync(profile);
         await _profileRepository.SaveChangesAsync();
+        
+        var verificationLink =
+            $"${_configuration["AppSettings:BaseUrl"]}/auth/verify-email?token={user.EmailVerificationToken}";
+
+        await _emailService.SendEmailAsync(
+            user.Email,
+            "Verify Your Account",
+            $"""
+            <h3>Email Verification</h3>
+            <p>Click the link below to verify your account:</p>
+            <a href="{verificationLink}">Verify Account</a>
+            OR
+            <p>{verificationLink}</p>
+            <p>This link expires in 15 minutes.</p>
+            """
+        );
 
         return new UserDto(user.Id, user.Name, user.Username, user.Email);
     }
@@ -135,4 +157,24 @@ public class AuthService : IAuthService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+    
+    public async Task<bool> VerifyEmailAsync(string token)
+    {
+        var user = await _userRepository.GetByVerificationTokenAsync(token);
+
+        if (user == null ||
+            user.EmailVerificationExpiredAt < DateTime.UtcNow)
+        {
+            return false;
+        }
+
+        user.IsEmailVerified = true;
+        user.EmailVerificationToken = null;
+        user.EmailVerificationExpiredAt = null;
+
+        await _userRepository.SaveChangesAsync();
+
+        return true;
+    }
+
 }

@@ -11,4 +11,6 @@ public interface IUserRepository
     Task DeleteAsync(User user);
     Task SaveChangesAsync();
     Task<User?> GetByEmailAsync(string email);
+    Task<User?> GetByVerificationTokenAsync(string token);
+
 }

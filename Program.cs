@@ -12,6 +12,10 @@ using RestaurantFoods.Utilities.Handlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using dotenv.net;
+
+// Load Environment Variables
+DotEnv.Load(options: new DotEnvOptions(ignoreExceptions: true));
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -63,6 +67,9 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(jwtSettings["Key"]!))
     };
 });
+
+// Add Email Service
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Add Services
 builder.Services.AddScoped<IUserService, UserService>();

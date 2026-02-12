@@ -19,8 +19,8 @@ public class User : BaseEntity
     [Column("email_verification_token", TypeName = "nvarchar(255)")]
     public string? EmailVerificationToken { get; set; }
 
-    [Column("email_verification_expires")]
-    public DateTime? EmailVerificationExpires { get; set; }
+    [Column("email_verification_expired_at")]
+    public DateTime? EmailVerificationExpiredAt { get; set; }
     
     [Column("is_email_verified")]
     public bool IsEmailVerified { get; set; } = false;

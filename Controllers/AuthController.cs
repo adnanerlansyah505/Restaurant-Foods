@@ -21,7 +21,13 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(RegisterDto dto)
     {
         var user = await _authService.RegisterAsync(dto);
-        return Ok(user);
+
+        return Ok(new ResponseHandlers<object>
+        {
+            Code = StatusCodes.Status201Created,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Register successful",
+        });
     }
 
     [HttpPost("login")]
@@ -81,6 +87,29 @@ public class AuthController : ControllerBase
             Code = StatusCodes.Status200OK,
             Status = HttpStatusCode.OK.ToString(),
             Message = "Password updated successfully"
+        });
+    }
+
+    [HttpGet("verify-email")]
+    public async Task<IActionResult> VerifyEmail(string token)
+    {
+        var result = await _authService.VerifyEmailAsync(token);
+
+        if (!result)
+        {
+            return BadRequest(new ResponseHandlers<object>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Invalid or expired verification token"
+            });
+        }
+
+        return Ok(new ResponseHandlers<object>
+        {
+            Code = StatusCodes.Status200OK,
+            Status = HttpStatusCode.OK.ToString(),
+            Message = "Email verified successfully"
         });
     }
 

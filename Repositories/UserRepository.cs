@@ -56,4 +56,10 @@ public class UserRepository : IUserRepository
         return await _context.Users
             .FirstOrDefaultAsync(u => u.Email == email);
     }
+    
+    public async Task<User?> GetByVerificationTokenAsync(string token)
+    {
+        return await _context.Users
+            .FirstOrDefaultAsync(u => u.EmailVerificationToken == token);
+    }
 }
