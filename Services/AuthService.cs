@@ -65,7 +65,7 @@ public class AuthService : IAuthService
         await _profileRepository.SaveChangesAsync();
         
         var verificationLink =
-            $"${_configuration["AppSettings:BaseUrl"]}/auth/verify-email?token={user.EmailVerificationToken}";
+            $"{_configuration["AppSettings:BaseUrl"]}/auth/verify-email?token={user.EmailVerificationToken}";
 
         await _emailService.SendEmailAsync(
             user.Email,
@@ -74,7 +74,7 @@ public class AuthService : IAuthService
             <h3>Email Verification</h3>
             <p>Click the link below to verify your account:</p>
             <a href="{verificationLink}">Verify Account</a>
-            OR
+            <br>OR<br>
             <p>{verificationLink}</p>
             <p>This link expires in 15 minutes.</p>
             """

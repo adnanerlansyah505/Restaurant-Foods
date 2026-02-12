@@ -3,6 +3,7 @@ using RestaurantFoods.Dtos.Auth;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Utilities.Handlers;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantFoods.Controllers;
 
@@ -17,6 +18,7 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
+    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {

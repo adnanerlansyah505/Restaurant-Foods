@@ -7,9 +7,11 @@ using RestaurantFoods.Services;
 using RestaurantFoods.Utilities.Handlers;
 using RestaurantFoods.Dtos.Users;
 using RestaurantFoods.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantFoods.Controllers;
 
+[Authorize(Roles = "admin")]
 [ApiController]
 [Route("api/users")]
 public class UsersController : ControllerBase
