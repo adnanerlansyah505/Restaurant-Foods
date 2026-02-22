@@ -23,7 +23,7 @@ public class AppDbContext : DbContext
         // Role configuration
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(r => r.Id);
+            entity.HasKey(r => r.Guid);
 
             entity.HasIndex(r => r.Slug)
                   .IsUnique();
@@ -35,7 +35,7 @@ public class AppDbContext : DbContext
         // User configuration
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(u => u.Id);
+            entity.HasKey(u => u.Guid);
 
             entity.HasIndex(u => u.Email)
                   .IsUnique();
@@ -55,7 +55,7 @@ public class AppDbContext : DbContext
         // Profile configuration
         modelBuilder.Entity<Profile>(entity =>
         {
-            entity.HasKey(p => p.Id);
+            entity.HasKey(p => p.Guid);
 
             entity.HasOne(p => p.User)
                 .WithOne(u => u.Profile)

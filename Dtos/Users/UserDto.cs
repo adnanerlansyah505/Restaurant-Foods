@@ -3,7 +3,7 @@ using RestaurantFoods.Models.Data;
 namespace RestaurantFoods.Dtos.Users;
 
 public record UserDto(
-    Guid Id,
+    Guid Guid,
     string Name,
     string Email,
     string Username,

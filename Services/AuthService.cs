@@ -47,7 +47,7 @@ public class AuthService : IAuthService
 
         var user = new User
         {
-            Id = Guid.NewGuid(),
+            Guid = Guid.NewGuid(),
             Name = dto.Name,
             Username = dto.Username,
             Email = dto.Email,
@@ -64,7 +64,7 @@ public class AuthService : IAuthService
         // Auto create profile
         var profile = new Profile
         {
-            UserId = user.Id
+            UserId = user.Guid
         };
 
         await _profileRepository.AddAsync(profile);
@@ -86,7 +86,7 @@ public class AuthService : IAuthService
             """
         );
 
-        return new UserDto(user.Id, user.Name, user.Username, user.Email);
+        return new UserDto(user.Guid, user.Name, user.Username, user.Email);
     }
 
     public async Task<string?> LoginAsync(LoginDto dto)
@@ -148,7 +148,7 @@ public class AuthService : IAuthService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Guid.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role.Slug)
         };

@@ -17,7 +17,7 @@ public static class UserSeeder
 
         var admin = new User
         {
-            Id = Guid.NewGuid(),
+            Guid = Guid.NewGuid(),
             Name = "System Admin",
             Username = "admin",
             Email = "admin@restaurantfoods.com",
@@ -28,7 +28,7 @@ public static class UserSeeder
 
         var user = new User
         {
-            Id = Guid.NewGuid(),
+            Guid = Guid.NewGuid(),
             Name = "Demo User",
             Username = "user",
             Email = "user@restaurantfoods.com",

@@ -36,7 +36,7 @@ public class UserService : IUserService
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .Select(u => new UserDto(
-                u.Id,
+                u.Guid,
                 u.Name,
                 u.Username,
                 u.Email,
@@ -62,7 +62,7 @@ public class UserService : IUserService
             return null;
 
         return new UserDto(
-            user.Id,
+            user.Guid,
             user.Name,
             user.Email,
             user.Username,
@@ -87,14 +87,14 @@ public class UserService : IUserService
         // Auto create profile
         var profile = new Profile
         {
-            UserId = user.Id
+            UserId = user.Guid
         };
 
         await _profileRepository.AddAsync(profile);
         await _profileRepository.SaveChangesAsync();
 
         return new UserDto(
-            user.Id,
+            user.Guid,
             user.Name,
             user.Email,
             user.Username,
@@ -116,7 +116,7 @@ public class UserService : IUserService
         await _userRepository.SaveChangesAsync();
 
         return new UserDto(
-            user.Id,
+            user.Guid,
             user.Name,
             user.Username,
             user.Email,

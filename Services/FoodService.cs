@@ -30,7 +30,7 @@ public class FoodService : IFoodService
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(f => new FoodDto(
-                    f.Id,
+                    f.Guid,
                     f.Name,
                     f.Description,
                     f.Price,
@@ -58,7 +58,7 @@ public class FoodService : IFoodService
             return null;
 
         return new FoodDto(
-            food.Id,
+            food.Guid,
             food.Name,
             food.Description,
             food.Price,
@@ -82,7 +82,7 @@ public class FoodService : IFoodService
         await _foodRepository.SaveChangesAsync();
 
         return new FoodDto(
-            food.Id,
+            food.Guid,
             food.Name,
             food.Description,
             food.Price,
@@ -105,7 +105,7 @@ public class FoodService : IFoodService
         await _foodRepository.SaveChangesAsync();
 
         return new FoodDto(
-            food.Id,
+            food.Guid,
             food.Name,
             food.Description,
             food.Price,

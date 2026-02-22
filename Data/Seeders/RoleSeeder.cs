@@ -16,19 +16,19 @@ public static class RoleSeeder
         {
             new()
             {
-                Id = AppRoles.AdminId,
+                Guid = AppRoles.AdminId,
                 Name = "Admin",
                 Slug = "admin"
             },
             new()
             {
-                Id = AppRoles.UserId,
+                Guid = AppRoles.UserId,
                 Name = "User",
                 Slug = "user"
             },
             new()
             {
-                Id = AppRoles.ChefId,
+                Guid = AppRoles.ChefId,
                 Name = "Chef",
                 Slug = "chef"
             }

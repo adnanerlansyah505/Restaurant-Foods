@@ -32,7 +32,7 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .Include(u => u.Role)
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Guid == id);
     }
 
     public async Task AddAsync(User user)

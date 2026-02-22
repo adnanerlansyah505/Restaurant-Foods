@@ -7,7 +7,7 @@ public abstract class BaseEntity
 {
     [Key]
     [Column("guid")]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Guid { get; set; } = Guid.NewGuid();
 
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }

@@ -30,7 +30,7 @@ public class FoodRepository : IFoodRepository
     public async Task<Food?> GetByIdAsync(Guid id)
     {
         return await _context.Foods
-            .FirstOrDefaultAsync(u => u.Id == id);
+            .FirstOrDefaultAsync(u => u.Guid == id);
     }
 
     public async Task AddAsync(Food food)
