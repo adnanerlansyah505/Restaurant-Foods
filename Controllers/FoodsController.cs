@@ -31,7 +31,7 @@ public class FoodsController : BaseApiController
         var (foods, meta) = await _foodService.GetFoodsAsync(page, pageSize);
 
         if (foods == null) 
-            return NotFoundResponse<IEnumerable<FoodDto>>("Foods not found");
+            return NotFoundResponse("Foods not found");
 
         return SuccessResponse(foods, "Foods retrieved successfully", meta);
     }
@@ -42,23 +42,50 @@ public class FoodsController : BaseApiController
         var food = await _foodService.GetFoodByIdAsync(id);
 
         if (food == null)
-            return NotFoundResponse<IEnumerable<FoodDto>>("Foods not found");
+            return NotFoundResponse("Foods not found");
 
         return SuccessResponse(food, "Food retrieved successfully");
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateFood(SaveFoodDto foodDto)
+    public async Task<IActionResult> CreateFood(
+        [FromBody] SaveFoodDto foodDto
+    )
     {
+        if (foodDto == null)
+            return BadRequestResponse("Request body is invalid or empty");
+
         var food = await _foodService.CreateFoodAsync(foodDto);
 
         return CreatedResponse(food, "Food created successfully");
     }
 
-    // [HttpPut("{id}")]
-    // public async Task<IActionResult> UpdateFood(Guid id, SaveFoodDto foodDto)
-    // {
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateFood(
+        Guid id, 
+        [FromBody] SaveFoodDto foodDto
+    )
+    {
+        if (foodDto == null)
+            return BadRequestResponse("Request body is invalid or empty");
+            
+        var food = await _foodService.UpdateFoodAsync(id, foodDto);
 
-    // }
+        if (food == null)
+            return NotFoundResponse("Food not found");
+
+        return SuccessResponse(food, "Food updated successfully");
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteFood(Guid id)
+    {
+        var food = await _foodService.DeleteFoodAsync(id);
+
+        if (!food)
+            return NotFoundResponse("Food not found");
+
+        return NoContentResponse("Food deleted successfully");
+    }
 
 }

@@ -14,5 +14,5 @@ public record SaveFoodDto(
 
     int? Cost,
     
-    Guid CategoryId
+    Guid? CategoryId
 );

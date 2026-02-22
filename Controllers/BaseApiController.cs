@@ -38,14 +38,38 @@ public class BaseApiController : ControllerBase
             });
     }
 
-    protected IActionResult NotFoundResponse<T>(
+    protected IActionResult NotFoundResponse(
         string message = "Resource not found"
     )
     {
-        return NotFound(new ResponseHandlers<T>
+        return NotFound(new ResponseHandlers<object?>
         {
             Code = StatusCodes.Status404NotFound,
             Status = HttpStatusCode.NotFound.ToString(),
+            Message = message
+        });
+    }
+
+    protected IActionResult BadRequestResponse(
+        string message = "Resource not found"
+    )
+    {
+        return BadRequest(new ResponseHandlers<object?>
+        {
+            Code = StatusCodes.Status400BadRequest,
+            Status = HttpStatusCode.BadRequest.ToString(),
+            Message = message
+        });
+    }
+
+    protected IActionResult NoContentResponse(
+        string message = ""
+    )
+    {
+        return Ok(new ResponseHandlers<object?>
+        {
+            Code = StatusCodes.Status204NoContent,
+            Status = HttpStatusCode.NoContent.ToString(),
             Message = message
         });
     }

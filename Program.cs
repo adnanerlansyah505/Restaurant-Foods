@@ -23,6 +23,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Response Handlers
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
+    options.SuppressModelStateInvalidFilter = true; // 🔥 ini penting
+
     options.InvalidModelStateResponseFactory = context =>
     {
         var errors = context.ModelState
@@ -30,7 +32,11 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             .ToDictionary(
                 x => x.Key,
                 x => x.Value!.Errors
-                    .Select(e => e.ErrorMessage)
+                    .Select(e =>
+                        string.IsNullOrEmpty(e.ErrorMessage)
+                            ? "Invalid value"
+                            : e.ErrorMessage
+                    )
                     .ToList()
             );
 
@@ -75,6 +81,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // Add Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IFoodService, FoodService>();
+builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 

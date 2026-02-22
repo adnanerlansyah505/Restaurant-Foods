@@ -19,8 +19,8 @@ public class Food : BaseEntity
     public int? Cost { get; set; }
 
     [Column("categoryId")]
-    public Guid CategoryId { get; set; }
+    public Guid? CategoryId { get; set; }
 
     // Navigation property
-    public Category Category { get; set; } = null!;
+    public Category? Category { get; set; }
 }

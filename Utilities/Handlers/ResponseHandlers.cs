@@ -16,7 +16,7 @@ public class ResponseHandlers<TEntity>
     [JsonPropertyName("data")]
     public TEntity? Data { get; set; }
     
-    [JsonPropertyName("errors")]
+    [JsonPropertyName("errorss")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public Dictionary<string, List<string>>? Errors { get; set; }
 

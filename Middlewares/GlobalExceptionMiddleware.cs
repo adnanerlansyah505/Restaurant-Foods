@@ -18,6 +18,20 @@ public class GlobalExceptionMiddleware
         {
             await _next(context);
         }
+        catch (JsonException)
+        {
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = "application/json";
+
+            var response = new ResponseHandlers<object>
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Status = HttpStatusCode.BadRequest.ToString(),
+                Message = "Invalid JSON format. Please check your request body."
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
+        }
         catch (AppException ex)
         {
             context.Response.StatusCode = ex.StatusCode;
@@ -36,10 +50,12 @@ public class GlobalExceptionMiddleware
 
             await context.Response.WriteAsync(JsonSerializer.Serialize(response));
         }
-        catch (Exception)
+        catch (Exception e)
         {
             context.Response.StatusCode = 500;
             context.Response.ContentType = "application/json";
+
+            Console.WriteLine(e.Message);
 
             var response = new ResponseHandlers<object>
             {
