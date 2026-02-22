@@ -7,13 +7,12 @@ public record SaveFoodDto(
     [StringLength(50)]
     string Name,
     
-    string Description,
+    string? Description,
 
     [Required]
     int Price,
 
-    [Required]
-    int Cost,
+    int? Cost,
     
-    Guid? CategoryId = null
+    Guid CategoryId
 );

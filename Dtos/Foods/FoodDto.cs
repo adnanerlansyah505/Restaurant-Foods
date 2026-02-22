@@ -5,8 +5,8 @@ namespace RestaurantFoods.Dtos.Foods;
 public record FoodDto(
     Guid Id,
     string Name,
-    string Description,
+    string? Description,
     int Price,
-    int Cost,
+    int? Cost = null,
     Guid? CategoryId = null
 );
