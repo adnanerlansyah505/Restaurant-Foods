@@ -66,13 +66,11 @@ public class AuthController : BaseApiController
     {
         try
         {
+            var clientId = configuration["Authentication:Google:ClientId"];
             var payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken,
                 new GoogleJsonWebSignature.ValidationSettings
                 {
-                    Audience = new[]
-                    {
-                        configuration["Authentication:Google:ClientId"]
-                    }
+                    Audience = new[] { clientId }
                 });
 
             var token = await _authService.GoogleLoginAsync(payload);
