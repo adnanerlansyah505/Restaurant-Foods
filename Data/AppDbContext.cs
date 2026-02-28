@@ -15,6 +15,9 @@ public class AppDbContext : DbContext
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Food> Foods => Set<Food>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

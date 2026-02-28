@@ -83,6 +83,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddHttpClient<IPaymentService, PaymentService>();
 
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 
