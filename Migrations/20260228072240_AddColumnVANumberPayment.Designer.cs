@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RestaurantFoods.Data;
 
@@ -11,9 +12,11 @@ using RestaurantFoods.Data;
 namespace RestaurantFoods.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260228072240_AddColumnVANumberPayment")]
+    partial class AddColumnVANumberPayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,8 +190,8 @@ namespace RestaurantFoods.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("guid");
 
-                    b.Property<decimal>("AmountPaid")
-                        .HasColumnType("decimal(18,2)")
+                    b.Property<int>("AmountPaid")
+                        .HasColumnType("int")
                         .HasColumnName("amount_paid");
 
                     b.Property<DateTime>("CreatedAt")
@@ -199,11 +202,12 @@ namespace RestaurantFoods.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("order_id");
 
-                    b.Property<DateTime?>("PaymentDate")
+                    b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2")
                         .HasColumnName("payment_date");
 
                     b.Property<string>("PaymentMethod")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("payment_method");
 

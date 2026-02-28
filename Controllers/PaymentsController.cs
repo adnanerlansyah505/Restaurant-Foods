@@ -8,6 +8,7 @@ using RestaurantFoods.Utilities.Handlers;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Dtos.Payments;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace RestaurantFoods.Controllers;
 
@@ -23,12 +24,31 @@ public class PaymentsController : BaseApiController
         _paymentService = paymentService;
     }
 
-    [HttpPost("pay")]
+    [HttpPost]
     public async Task<IActionResult> CreatePayment(CreatePaymentDto dto)
     {
-        var snapToken = await _paymentService.CreateTransactionAsync(dto.OrderId);
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null)
+            return Unauthorized("User ID claim not found");
+
+        var userId = Guid.Parse(userIdClaim.Value);
+
+        var snapToken = await _paymentService.CreateTransactionAsync(dto.OrderId, userId);
 
         return SuccessResponse(new { token = snapToken }, "Pay the order successfully");
+    }
+
+    [AllowAnonymous]
+    [HttpPost("notification")]
+    public async Task<IActionResult> MidtransNotification()
+    {
+        using var reader = new StreamReader(Request.Body);
+        var json = await reader.ReadToEndAsync();
+
+        await _paymentService.HandleNotificationAsync(json);
+
+        return Ok();
     }
 
 }

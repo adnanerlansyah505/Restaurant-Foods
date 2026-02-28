@@ -1,6 +1,8 @@
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using RestaurantFoods.Models.Data;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Repositories.Interfaces;
 using RestaurantFoods.Utilities.Enum;
@@ -24,12 +26,18 @@ public class PaymentService : IPaymentService
         _httpClient = httpClient;
     }
 
-    public async Task<string> CreateTransactionAsync(Guid orderId)
+    public async Task<string> CreateTransactionAsync(Guid orderId, Guid userId)
     {
         var order = await _paymentRepository.GetOrderWithItemsAsync(orderId);
 
         if (order == null)
             throw new Exception("Order not found");
+            
+        if(order.UserId != userId)
+            throw new UnauthorizedAccessException("Access denied");
+
+        if(order.Status != TypeStatusOrder.Pending)
+            throw new InvalidOperationException("Order already paid");
 
         var serverKey = _configuration["Midtrans:ServerKey"];
         var baseUrl = _configuration["Midtrans:BaseUrl"];
@@ -76,34 +84,115 @@ public class PaymentService : IPaymentService
     {
         using var doc = JsonDocument.Parse(json);
 
-        var orderId = doc.RootElement
-            .GetProperty("order_id").GetString();
+        var root = doc.RootElement;
 
-        var transactionStatus = doc.RootElement
-            .GetProperty("transaction_status").GetString();
+        var orderId = root.GetProperty("order_id").GetString();
+        var statusCode = root.GetProperty("status_code").GetString();
+        var grossAmount = root.GetProperty("gross_amount").GetString();
+        var signatureKey = root.GetProperty("signature_key").GetString();
+        var transactionStatus = root.GetProperty("transaction_status").GetString();
+        var paymentType = root.GetProperty("payment_type").GetString();
 
         if (!Guid.TryParse(orderId, out var guid))
             return;
 
+        var serverKey = _configuration["Midtrans:ServerKey"];
+
+        // ================================
+        // SIGNATURE VALIDATION
+        // ================================
+        var raw = orderId + statusCode + grossAmount + serverKey;
+
+        using var sha = SHA512.Create();
+        var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(raw));
+        var computedSignature = BitConverter.ToString(hash)
+            .Replace("-", "")
+            .ToLower();
+
+        if (computedSignature != signatureKey)
+            return; // Invalid signature
+
+        // ================================
+        // GET ORDER & PAYMENT
+        // ================================
         var order = await _paymentRepository
             .GetOrderWithItemsAsync(guid);
 
         if (order == null)
             return;
 
+        var payment = await _paymentRepository
+            .GetPaymentByOrderIdAsync(guid);
+
+        if (payment == null)
+        {
+            payment = await _paymentRepository
+                .CreatePaymentAsync(order.Guid);
+        }
+
+        var grossAmountStr = root.GetProperty("gross_amount").GetString();
+        var grossTotal = Convert.ToDecimal(grossAmountStr);
+
+        payment.AmountPaid = grossTotal;
+        // ================================
+        // EXTRACT BANK / VA NUMBER
+        // ================================
+        string? bank = null;
+        string? vaNumber = null;
+
+        if (paymentType == "bank_transfer" &&
+            root.TryGetProperty("va_numbers", out var vaNumbers) &&
+            vaNumbers.GetArrayLength() > 0)
+        {
+            bank = vaNumbers[0].GetProperty("bank").GetString();
+            vaNumber = vaNumbers[0].GetProperty("va_number").GetString();
+        }
+
+        // ================================
+        // UPDATE PAYMENT DATA
+        // ================================
+        payment.PaymentMethod = paymentType;
+        payment.VaNumber = vaNumber;
+        PaymentStatus status = transactionStatus switch
+        {
+            "settlement" => PaymentStatus.Paid,
+            "capture"    => PaymentStatus.Paid,
+            "pending"    => PaymentStatus.Pending,
+            "expire"     => PaymentStatus.Expired,
+            "cancel"     => PaymentStatus.Failed,
+            "deny"       => PaymentStatus.Failed,
+            _            => PaymentStatus.Pending
+        };
+
+        payment.PaymentStatus = status;
+
+        if (transactionStatus == "settlement" ||
+            transactionStatus == "capture")
+        {
+            payment.PaymentDate = DateTime.UtcNow;
+        }
+
+        // ================================
+        // UPDATE ORDER STATUS
+        // ================================
         switch (transactionStatus)
         {
+            case "capture":
             case "settlement":
                 order.Status = TypeStatusOrder.Confirmed;
                 break;
 
+            case "pending":
+                order.Status = TypeStatusOrder.Pending;
+                break;
+
             case "expire":
             case "cancel":
+            case "deny":
                 order.Status = TypeStatusOrder.Cancelled;
                 break;
         }
 
-        await _paymentRepository.UpdateOrderStatusAsync(order);
         await _paymentRepository.SaveChangesAsync();
     }
 }

@@ -8,16 +8,19 @@ namespace RestaurantFoods.Models.Data;
 public class Payment : BaseEntity
 {
     [Column("payment_date")]
-    public required DateTime PaymentDate { get; set; }
+    public DateTime? PaymentDate { get; set; }
 
     [Column("payment_method")]
-    public required string PaymentMethod { get; set; }
+    public string? PaymentMethod { get; set; }
     
     [Column("payment_status")]
-    public required PaymentStatus PaymentStatus { get; set; }
+    public required PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
+
+    [Column("va_number", TypeName = "nvarchar(255)")]
+    public string? VaNumber { get; set; }
 
     [Column("amount_paid")]
-    public required int AmountPaid { get; set; }
+    public required decimal AmountPaid { get; set; }
     
     [Column("transaction_reference")]
     public string? TransactionReference { get; set; }
