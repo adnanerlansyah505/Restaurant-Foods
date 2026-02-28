@@ -1,15 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
 using RestaurantFoods.Dtos.Auth;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Utilities.Handlers;
 using System.Net;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 namespace RestaurantFoods.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController : ControllerBase
+public class AuthController : BaseApiController
 {
     private readonly IAuthService _authService;
 
@@ -54,6 +55,39 @@ public class AuthController : ControllerBase
             Message = "Login successful",
             Data = new { token }
         });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("signin-google")]
+    public async Task<IActionResult> GoogleLogin(
+        GoogleLoginDto dto,
+        [FromServices] IConfiguration configuration
+    )
+    {
+        try
+        {
+            var payload = await GoogleJsonWebSignature.ValidateAsync(dto.IdToken,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[]
+                    {
+                        configuration["Authentication:Google:ClientId"]
+                    }
+                });
+
+            var token = await _authService.GoogleLoginAsync(payload);
+
+            return SuccessResponse(new { token }, "Google login successfully");
+        }
+        catch
+        {
+            return Unauthorized(new ResponseHandlers<object>
+            {
+                Code = StatusCodes.Status401Unauthorized,
+                Status = HttpStatusCode.Unauthorized.ToString(),
+                Message = "Invalid Google token"
+            });
+        }
     }
 
     [HttpPost("forgot-password")]

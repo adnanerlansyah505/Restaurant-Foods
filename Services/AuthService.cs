@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;         
 using System.Text;
+using Google.Apis.Auth;
+using Microsoft.Extensions.Configuration;
 
 namespace RestaurantFoods.Services;
 
@@ -97,6 +99,28 @@ public class AuthService : IAuthService
             !_passwordHasher.Verify(user.Password, dto.Password))
         {
             return null;
+        }
+
+        return GenerateJwtToken(user);
+    }
+
+    public async Task<string?> GoogleLoginAsync(GoogleJsonWebSignature.Payload payload)
+    {
+        var user = await _userRepository.GetByEmailAsync(payload.Email);
+
+        if (user == null)
+        {
+            user = new User
+            {
+                Email = payload.Email,
+                Username = payload.Email,
+                Name = payload.Name,
+                Password = "", // not used
+                IsEmailVerified = true
+            };
+
+            await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
         }
 
         return GenerateJwtToken(user);
