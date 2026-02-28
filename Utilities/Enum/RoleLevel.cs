@@ -1,4 +1,4 @@
-namespace Task_Management.Utilities.Enum;
+namespace RestaurantFoods.Utilities.Enum;
 
 public enum RoleLevel
 {

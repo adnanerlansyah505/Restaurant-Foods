@@ -44,4 +44,7 @@ public class User : BaseEntity
     // Navigation property
     public Role Role { get; set; } = null!;
     public Profile? Profile { get; set; }
+
+    // One User -> Many Orders
+    public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

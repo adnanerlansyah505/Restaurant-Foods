@@ -21,6 +21,12 @@ public class Food : BaseEntity
     [Column("categoryId")]
     public Guid? CategoryId { get; set; }
 
+    [Column("isAvailable")]
+    public bool isAvailable { get; set; } = true;
+
     // Navigation property
     public Category? Category { get; set; }
+
+    // One Food -> Many OrderItems
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }
