@@ -116,11 +116,15 @@ public class AuthService : IAuthService
                 Username = payload.Email,
                 Name = payload.Name,
                 Password = "", // not used
-                IsEmailVerified = true
+                IsEmailVerified = true,
+                RoleId = AppRoles.UserId
             };
 
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
+
+            user = await _userRepository.GetByEmailAsync(payload.Email)
+                ?? throw new Exception("User creation failed");
         }
 
         return GenerateJwtToken(user);

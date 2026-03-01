@@ -5,6 +5,7 @@ using RestaurantFoods.Repositories.Interfaces;
 using RestaurantFoods.Services.Interfaces;
 using RestaurantFoods.Models.Data;
 using RestaurantFoods.Services.Security;
+using RestaurantFoods.Constants;
 
 namespace RestaurantFoods.Services;
 
@@ -78,7 +79,7 @@ public class UserService : IUserService
             Username = userDto.Username,
             Email = userDto.Email,
             Password = _passwordHasher.Hash(userDto.Password),
-            RoleId = Guid.Parse("22222222-2222-2222-2222-222222222222")
+            RoleId = AppRoles.UserId
         };
 
         await _userRepository.AddAsync(user);

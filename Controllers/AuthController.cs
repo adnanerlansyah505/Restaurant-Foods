@@ -77,8 +77,9 @@ public class AuthController : BaseApiController
 
             return SuccessResponse(new { token }, "Google login successfully");
         }
-        catch
+        catch (Exception e)
         {
+            Console.WriteLine(e);
             return Unauthorized(new ResponseHandlers<object>
             {
                 Code = StatusCodes.Status401Unauthorized,

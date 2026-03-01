@@ -20,6 +20,19 @@ DotEnv.Load(options: new DotEnvOptions(ignoreExceptions: true));
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
+
 // Add Response Handlers
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
@@ -164,7 +177,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors();
+app.UseCors("AllowFrontend");
 
 // Add Middleware Global for Exception
 app.UseMiddleware<GlobalExceptionMiddleware>();
